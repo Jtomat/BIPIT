@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="DBContext-Web.config Connection String" description="DBContext Строка подключения в web.config, используемая приложением для доступа к базе данных." defaultValue="workstation id=PISKAREK.mssql.somee.com;packet size=4096;user id=secondAcy_SQLLogin_1;pwd=2o8gynzbz3;data source=PISKAREK.mssql.somee.com;persist security info=False;initial catalog=PISKAREK" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="D:\\Sourse\\VS\\repos\\Bipit_11_12\\Bipit_11_12\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DBContext']/@connectionString" />
+  </parameter>
+</parameters>

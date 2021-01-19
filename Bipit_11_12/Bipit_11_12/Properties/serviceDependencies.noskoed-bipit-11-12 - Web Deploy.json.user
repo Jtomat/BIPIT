@@ -1,0 +1,30 @@
+{
+  "dependencies": {},
+  "parameters": {
+    "noskoed-bipit-11-12.resourceGroupName": {
+      "Name": "noskoed-bipit-11-12.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "learn-293f47f8-22f2-477e-bb30-8aae16cb68a0"
+    },
+    "noskoed-bipit-11-12.subscriptionId": {
+      "Name": "noskoed-bipit-11-12.subscriptionId",
+      "Type": "subscription",
+      "Value": "dbd5fc7a-ee7e-41e7-8630-b6f38840b7b8"
+    },
+    "noskoed-bipit-11-12.resourceName": {
+      "Name": "noskoed-bipit-11-12.resourceName",
+      "Type": null,
+      "Value": "noskoed-bipit-11-12"
+    },
+    "subscriptionId": {
+      "Name": "subscriptionId",
+      "Type": "subscription",
+      "Value": "dbd5fc7a-ee7e-41e7-8630-b6f38840b7b8"
+    },
+    "noskoed-bipit-11-12.resourceGroupLocation": {
+      "Name": "noskoed-bipit-11-12.resourceGroupLocation",
+      "Type": null,
+      "Value": "westus"
+    }
+  }
+}

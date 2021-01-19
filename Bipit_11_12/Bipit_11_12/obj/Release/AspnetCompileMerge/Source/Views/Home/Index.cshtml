@@ -1,0 +1,244 @@
+﻿<div class="jumbotron">
+    <h1>Единственная страница</h1>
+</div>
+<style>
+    tr {
+        border-bottom: solid 2px lightgray;
+    }
+    .hea {
+        margin:5px;
+    }
+    td {
+        margin: 5px;
+        border-right:dashed 1px lightgray;
+    }
+    .adder {
+        margin: 5px;
+        border: solid 2px lightgreen;
+        height: 150px;
+    }
+</style>
+<div id="Users" style="display:flex" class="row">
+    <div style="display:inline-block;width:800px;">
+        <table id="UsersTab">
+            <tr>
+                <th><div class="hea">ID</div></th>
+                <th><div class="hea">Name</div></th>
+                <th><div class="hea">Password</div></th>
+            </tr>
+        </table>
+    </div>
+    <div style="display:inline-block" class="adder">
+        <p>Name:<input id="UsersName" type="text" value=""/></p>
+        <p>Password:<input id="UsersPass" type="text" value=""/></p>
+        <p><button id="AddUsers">Добавить</button></p>
+    </div>
+    <script>
+
+        function Update() {
+            var namers = {
+                "Users": {},
+                "TODO": {}
+            };
+            $("#ResUsers").children().remove();
+            $("#ResTODO").children().remove();
+            var ended = [$.Deferred(), $.Deferred()];
+            $.getJSON("../api/Users/")
+                .done(function (data) {
+                    while ($("#UsersTab").children()[0].children.length > 1)
+                        $("#UsersTab").children()[0].removeChild($("#UsersTab").children()[0].lastChild);
+                    $.each(data, function (key, item) {
+                        // Add a list item for the product.
+                        namers["Users"][item["ID"]] = item["Name"];
+                        $("#UsersTab").append(
+                            "<tr><td>" + item["ID"] +
+                            "</td><td>" + item["Name"] +
+                            "</td><td>" + item["Pass"] +
+                            "</td>" + "<td><button id='U" + item["ID"] + "' >Удалить</button></td>" + "</tr>");
+                        $("#U" + item["ID"]).click(function () {
+                            $.ajax({
+                                url: '../api/Users/' + item["ID"],
+                                type: 'DELETE',
+                                contentType: 'application/json;charset=utf-8',
+                                success: function () {
+                                    Update();
+                                }
+                            });
+                        });
+                        //$('<li>', { text: formatItem(item) }).appendTo($('#products'));
+                    });
+                    $.each(namers["Users"], function (key, item) {
+                        $("#ResUsers").append(`<option value ="${key}">"${item}"</option>`);
+                    });
+                    ended[0].resolve(1);
+                });
+            $.getJSON("../api/TODO/")
+                .done(function (data) {
+                    while ($("#TODOTab").children()[0].children.length > 1)
+                        $("#TODOTab").children()[0].removeChild($("#TODOTab").children()[0].lastChild);
+                    $.each(data, function (key, item) {
+                        // Add a list item for the product.
+                        namers["TODO"][item["ID"]] = [item["Name"], item["Price"]];
+                        $("#TODOTab").append(
+                            "<tr><td>" + item["ID"] +
+                            "</td><td>" + item["Name"] +
+                            "</td><td>" + item["Price"] +
+                            "</td>" + "<td><button id='T" + item["ID"] + "' >Удалить</button></td>" + "</tr>");
+                        $("#T" + item["ID"]).click(function () {
+                            $.ajax({
+                                url: '../api/TODO/' + item["ID"],
+                                type: 'DELETE',
+                                contentType: 'application/json;charset=utf-8',
+                                success: function () {
+                                    Update();
+                                }
+                            });
+                        });
+                        //$('<li>', { text: formatItem(item) }).appendTo($('#products'));
+                    });
+
+                    ended[1].resolve(1);
+                    $.each(namers["TODO"], function (key, item) {
+                        $("#ResTODO").append(`<option value ="${key}">"${item[0]}"</option>`);
+                    });
+                    $("#ResTODO").change(function () {
+                        //console.log(namers["TODO"][$("#ResTODO option:selected").val()][1]);
+                        $("#ResPrice").val(namers["TODO"][$("#ResTODO option:selected").val()][1]);
+                    });
+                });
+            $.when(ended[0],ended[1]).then(function () {
+                $.getJSON("../api/Res/")
+                    .done(function (data) {
+                        while ($("#ResTab").children()[0].children.length > 1)
+                            $("#ResTab").children()[0].removeChild($("#ResTab").children()[0].lastChild);
+                        $.each(data, async function (key, item) {
+                            // Add a list item for the product.
+
+                            $("#ResTab").append(
+                                "<tr><td>" + item["ID"] +
+                                "</td><td>" + namers["Users"][item["ID_user"]] +
+                                "</td><td>" + namers["TODO"][item["ID_todo"]][0] +
+                                "</td><td>" + item["Date"] +
+                                "</td>" + "<td><button id='R" + item["ID"] + "' >Удалить</button></td>" + "</tr>");
+
+                            $("#R" + item["ID"]).click(function () {
+                                $.ajax({
+                                    url: '../api/Res/' + item["ID"],
+                                    type: 'DELETE',
+                                    contentType: 'application/json;charset=utf-8',
+                                    success: function () {
+                                        Update();
+                                    }
+                                });
+                            });
+                            //$('<li>', { text: formatItem(item) }).appendTo($('#products'));
+                        });
+
+                    });
+            });
+            //while ((!ended[0]) && (!ended[1])) { }
+
+        }
+        $(document).ready(function () {
+            Update();
+            // Send an AJAX request
+            $("#AddUsers").click(function () {
+                var value = {
+                    "Name": $("#UsersName").val(),
+                    "Pass": $("#UsersPass").val()
+                };
+                if (value["Name"] != "" && value["Pass"] != "")
+                    $.ajax({
+                        url: '../api/Users',
+                        type: 'POST',
+                        data: JSON.stringify(value),
+                        contentType: 'application/json;charset=utf-8',
+                        success: function () {
+                            Update();
+                        }
+                    });
+                else
+                    alert("Одно из значений для пользователя не введено.");
+            });
+            $("#AddTODO").click(function () {
+                var value = {
+                    "Name": $("#TODOName").val(),
+                    "Price": $("#TODOPrice").val()
+                };
+
+                if (value["Name"] != "" && value["Price"] != "")
+                $.ajax({
+                    url: '../api/TODO',
+                    type: 'POST',
+                    data: JSON.stringify(value),
+                    contentType: 'application/json;charset=utf-8',
+                    success: function () {
+                        Update();
+                    }
+                });
+                else
+                    alert("Одно из значений для услуги не введено.");
+            });
+            $("#AddRes").click(function () {
+                var value = {
+                    "ID_user": $("#ResUsers option:selected").val(),
+                    "ID_todo": $("#ResTODO option:selected").val(),
+                    "Date": $("#ResDate").val()
+                };
+
+                if (value["ID_user"] != "" && value["ID_todo"] != "" && value["Date"] != undefined)
+                    $.ajax({
+                        url: '../api/Res/',
+                        type: 'POST',
+                        data: JSON.stringify(value),
+                        contentType: 'application/json;charset=utf-8',
+                        success: function () {
+                            Update();
+                        }
+                    });
+            });
+        });
+    </script>
+</div>
+<div id="TODO" style="display:flex" class="row">
+    <div style="display: inline-block;
+        width: 800px;">
+        <table id="TODOTab">
+            <tr>
+                <th><div class="hea">ID</div></th>
+                <th><div class="hea">Name</div></th>
+                <th><div class="hea">Price</div></th>
+            </tr>
+        </table>
+    </div>
+    <div style="display:inline-block" class="adder">
+        <p>Name:<input id="TODOName" type="text" value=""/></p>
+        <p>Price:<input id="TODOPrice" type="number" min="1" value=""/></p>
+        <p><button id="AddTODO">Добавить</button></p>
+    </div>
+</div>
+<div id="Res" style="display:flex" class="row">
+    <div style="display: inline-block;
+        width: 800px;">
+        <table id="ResTab">
+            <tr>
+                <th><div class="hea">ID</div></th>
+                <th><div class="hea">User Name</div></th>
+                <th><div class="hea">TODO Name</div></th>
+                <th><div class="hea">Price</div></th>
+                <th><div class="hea">Date</div></th>
+            </tr>
+        </table>
+    </div>
+    <div style="display:inline-block" class="adder">
+        <select id="ResUsers"></select>
+        <select id="ResTODO"></select>
+        <input type="number" id="ResPrice" disabled/>
+        <input type="date" id="ResDate"/>
+        <!--
+    <p>Name:<input id="ResName" type="text" value="" /></p>
+    <p>Password:<input id="TODOPrice" type="number" min="1" value="" /></p>
+        -->
+        <p><button id="AddRes">Добавить</button></p>
+    </div>
+</div>
